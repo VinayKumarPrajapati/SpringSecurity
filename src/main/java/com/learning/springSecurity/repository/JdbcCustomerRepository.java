@@ -43,4 +43,7 @@ public class JdbcCustomerRepository {
         jdbcTemplate.execute(sql);
     }
 
+    public void updateCustomerFullName(int customer_id, String newFullName){
+        var sql = "CALL update_jdbc_customer("+ customer_id +",'" + newFullName + "')";
+    }
 }
