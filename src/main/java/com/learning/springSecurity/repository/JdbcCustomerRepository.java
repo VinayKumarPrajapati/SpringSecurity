@@ -6,6 +6,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.Optional;
 
 @Repository
@@ -20,16 +21,26 @@ public class JdbcCustomerRepository {
         return jdbcTemplate.queryForObject(sql,this::mapToCustomer);
     }
 
-    private JdbcCustomer mapToCustomer(ResultSet rs,long rowNum){
+    private JdbcCustomer mapToCustomer(ResultSet rs,long rowNum) throws SQLException {
         var customer = new JdbcCustomer();
 
         Optional.ofNullable(rs.getDate("birth_date")).ifPresent(b -> customer.setBirthDate(b.toLocalDate()));
         customer.setCustomerId(rs.getInt("customer_id"));
-        customer.setEmail(rs.getInt("email"));
+        customer.setEmail(rs.getString("email"));
         customer.setFullName(rs.getString("full_name"));
         customer.setGender(rs.getString("gender"));
 
         return customer;
+    }
+
+    public void createCustomer(JdbcCustomer newCustomer){
+        var sql = "INSERT INTO jdbc_customer(full_name, email, birth_date, gender) VALUES ('"
+        + newCustomer.getFullName() + ""+
+        newCustomer.getEmail() + ""+ 
+        newCustomer.getBirthDate() + ""+
+        newCustomer.getGender() + ""+"')";
+
+        jdbcTemplate.execute(sql);
     }
 
 }
